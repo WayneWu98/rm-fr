@@ -3,29 +3,28 @@ import { ref, nextTick, computed, onMounted, watch } from 'vue'
 import { prefix, RM_CMD } from './pseudo-tty'
 import raw from '../assets/log.txt?raw'
 
-defineProps<{ actions: string[] }>()
 const history = ref<string[]>([])
 
-const tty = ref<HTMLDIVElement>()
+const tty = ref<HTMLDivElement>()
 const stdin = ref<HTMLParagraphElement>()
 const flushing = ref(false)
 const cmd = ref(RM_CMD)
 
 let rmed = false
 
-const onInput = () => cmd.value = stdin.value.innerText
+const onInput = () => cmd.value = stdin.value!.innerText
 
-let queue = Promise.resolve()
+let queue: Promise<void> = Promise.resolve()
 const LIMIT = 1000
 
-const sleep = (duration: number) => new Promise(r => setTimeout(r, duration))
+const sleep = (duration: number) => new Promise<void>(r => setTimeout(r, duration))
 
 const print = (s: string) => {
   if (history.value.length >= LIMIT) {
     history.value.shift()
   }
   history.value.push(s)
-  tty.value.scrollTop = 999999
+  tty.value!.scrollTop = 999999
   return sleep(Math.random() * 3 + 1)
 }
 
@@ -33,7 +32,7 @@ watch(
   flushing,
   v => {
     nextTick(() => {
-      tty.value.scrollTop = 999999
+      tty.value!.scrollTop = 999999
       if (!flushing.value) focus()
     })
   }
@@ -47,11 +46,11 @@ const log = (s: string | string[]) => {
 }
 
 const focus = () => {
-  const s = window.getSelection()
+  const s = window.getSelection()!
   const r = document.createRange()
-  const l = stdin.value.childNodes.length
-  r.setStart(stdin.value, l)
-  r.setEnd(stdin.value, l)
+  const l = stdin.value!.childNodes.length
+  r.setStart(stdin.value!, l)
+  r.setEnd(stdin.value!, l)
   s.removeAllRanges()
   s.addRange(r)
 }
@@ -67,7 +66,7 @@ const runCommand = (s: string) => {
 
 onMounted(() => {
   focus()
-  stdin.value.registerKeyshort(['Enter'], () => runCommand(stdin.value.innerText))
+  stdin.value!.registerKeyshort(['Enter'], () => runCommand(stdin.value!.innerText))
 })
 
 defineExpose({ runCommand })

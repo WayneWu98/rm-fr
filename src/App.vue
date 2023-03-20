@@ -5,7 +5,7 @@ import { RM_CMD } from './components/pseudo-tty'
 
 const tty = ref<typeof PseudoTty>()
 
-onMounted(() => document.body.registerKeyshort(['Enter'], () => tty.value.runCommand(RM_CMD)))
+onMounted(() => document.body.registerKeyshort(['Enter'], () => tty.value!.runCommand(RM_CMD)))
 
 </script>
 
